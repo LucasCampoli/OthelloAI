@@ -12,10 +12,10 @@ class OthelloGame:
 
     #Initialize board and variables
     def __init__(self):
-        self.is_black = None
         pygame.init()
         self.game_board = self.initialize_board()
-        self.white_turn = False
+        self.player_color = CellStates.BLACK
+        self.current_color = CellStates.BLACK
         self.screen = None
 
     # Aux method
@@ -58,10 +58,10 @@ class OthelloGame:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if black_button.collidepoint(event.pos):
-                        self.is_black = True
+                        self.player_color = CellStates.BLACK
                         return 'black'
                     elif white_button.collidepoint(event.pos):
-                        self.is_black = False
+                        self.player_color = CellStates.WHITE
                         return 'white'
 
             pygame.display.flip()
@@ -88,13 +88,46 @@ class OthelloGame:
         x, y = pos
         cell_coords = (math.ceil((x - 50) / 100) - 1, math.ceil((y - 100) / 100) - 1)
         if 0 <= cell_coords[0] < 8 and 0 <= cell_coords[1] < 8:
-            valid, valid_directions = is_valid_play(self.game_board, cell_coords[0], cell_coords[1], self.white_turn)
+            valid, valid_directions = is_valid_play(self.game_board, cell_coords[0], cell_coords[1], self.current_color)
             if valid:
                 for direction in valid_directions:
-                    change_line(self.game_board, cell_coords[0], cell_coords[1], direction, self.white_turn)
-                self.white_turn = not self.white_turn
+                    change_line(self.game_board, cell_coords[0], cell_coords[1], direction, self.current_color)
+                self.current_color = CellStates.WHITE if self.current_color == CellStates.BLACK else CellStates.BLACK
             else:
                 print("Invalid move")
+
+    def minimax(self, board, depth, alpha, beta, maximizing_player):
+        if depth == 0:
+            return self.utility(board), None
+        best_move = None
+        if maximizing_player:
+            max_eval = float('-inf')
+            for move in get_valid_plays(board, self.current_color):
+                temp_board = board.copy()
+                for direction in move.directions:
+                    change_line(temp_board, move[0], move[1], direction, self.current_color)
+                eval = self.minimax(temp_board, depth - 1, alpha, beta, False)[0]
+                if eval > max_eval:
+                    max_eval = eval
+                    best_move = move
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return max_eval, best_move
+        else:
+            min_eval = float('inf')
+            for move in get_valid_plays(board, CellStates.BLACK if self.current_color == CellStates.WHITE else CellStates.BLACK):
+                temp_board = board.copy()
+                for direction in move.directions:
+                    change_line(temp_board, move[0], move[1], direction, CellStates.BLACK if self.current_color == CellStates.WHITE else CellStates.BLACK)
+                eval = self.minimax(temp_board, depth - 1, alpha, beta, True)[0]
+                if eval < min_eval:
+                    min_eval = eval
+                    best_move = move
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return min_eval, best_move
 
     def run(self):
         # Let the play decide color
@@ -115,6 +148,9 @@ class OthelloGame:
             self.draw_board()
 
             pygame.display.flip()
+
+    def utility(self, board):
+        pass
 
 
 if __name__ == "__main__":
