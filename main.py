@@ -12,6 +12,7 @@ class OthelloGame:
 
     #Initialize board and variables
     def __init__(self):
+        self.is_black = None
         pygame.init()
         self.game_board = self.initialize_board()
         self.white_turn = False
@@ -57,8 +58,10 @@ class OthelloGame:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if black_button.collidepoint(event.pos):
+                        self.is_black = True
                         return 'black'
                     elif white_button.collidepoint(event.pos):
+                        self.is_black = False
                         return 'white'
 
             pygame.display.flip()
@@ -95,7 +98,7 @@ class OthelloGame:
 
     def run(self):
         # Let the play decide color
-        player_color = self.choose_color()
+        self.choose_color()
 
         # New window to play the game
         self.screen = pygame.display.set_mode((900, 950))
