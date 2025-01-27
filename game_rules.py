@@ -3,7 +3,7 @@ from cell import *
 
 def is_valid_play(board, x, y, current_color):
     if board[y][x].state != CellStates.EMPTY:
-        return False  # The cell must be empty to be a valid play.
+        return False, []  # The cell must be empty to be a valid play.
 
     opponent_color = CellStates.BLACK if current_color == CellStates.WHITE else CellStates.WHITE
 

@@ -97,15 +97,16 @@ class OthelloGame:
                 print("Invalid move")
 
     def minimax(self, board, depth, alpha, beta, maximizing_player):
-        if depth == 0:
-            return self.utility(board), None
         best_move = None
+        if depth == 0:
+            return self.utility(board), best_move
         if maximizing_player:
             max_eval = float('-inf')
             for move in get_valid_plays(board, self.current_color):
+                (x, y), valid_directions = move
                 temp_board = board.copy()
-                for direction in move.directions:
-                    change_line(temp_board, move[0], move[1], direction, self.current_color)
+                for direction in valid_directions:
+                    change_line(temp_board, x, y, direction, self.current_color)
                 eval = self.minimax(temp_board, depth - 1, alpha, beta, False)[0]
                 if eval > max_eval:
                     max_eval = eval
@@ -117,9 +118,10 @@ class OthelloGame:
         else:
             min_eval = float('inf')
             for move in get_valid_plays(board, CellStates.BLACK if self.current_color == CellStates.WHITE else CellStates.BLACK):
+                (x, y), valid_directions = move
                 temp_board = board.copy()
-                for direction in move.directions:
-                    change_line(temp_board, move[0], move[1], direction, CellStates.BLACK if self.current_color == CellStates.WHITE else CellStates.BLACK)
+                for direction in valid_directions:
+                    change_line(temp_board, x, y, direction, CellStates.BLACK if self.current_color == CellStates.WHITE else CellStates.BLACK)
                 eval = self.minimax(temp_board, depth - 1, alpha, beta, True)[0]
                 if eval < min_eval:
                     min_eval = eval
@@ -145,12 +147,22 @@ class OthelloGame:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.handle_click(event.pos)
 
+            """
+                        if self.current_color != self.player_color:
+                            utility, best_move = self.minimax(self.game_board, 3, float('-inf'), float('inf'), True)
+                            if best_move:
+                                (x, y), valid_directions = best_move
+                                for direction in valid_directions:
+                                    change_line(self.game_board, x, y, direction, self.current_color)
+                                self.current_color = self.player_color
+            """
+
             self.draw_board()
 
             pygame.display.flip()
 
     def utility(self, board):
-        pass
+        return 0
 
 
 if __name__ == "__main__":
