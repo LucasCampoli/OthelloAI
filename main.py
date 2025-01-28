@@ -105,7 +105,7 @@ class OthelloGame:
             valid = is_valid_play(self.game_board, cell_coords[0], cell_coords[1], self.current_color)
             if valid:
                 self.game_board = make_move(self.game_board, cell_coords[0], cell_coords[1], self.current_color)
-                self.current_color = CellStates.WHITE if self.current_color == CellStates.BLACK else CellStates.BLACK
+                self.current_color = self.opponent_color
             else:
                 print("Invalid move")
 
@@ -126,7 +126,7 @@ class OthelloGame:
             if self.current_color == self.opponent_color:
                 utility, best_move = ai.minimax(self.game_board, 3, float('-inf'), float('inf'), True)
                 if best_move:
-                    time.sleep(0.5)
+                    time.sleep(1)
                     self.game_board = make_move(self.game_board, best_move[0], best_move[1], self.current_color)
                 self.current_color = self.player_color
 
@@ -137,16 +137,20 @@ class OthelloGame:
                 elif event.type == pygame.MOUSEBUTTONDOWN and self.current_color == self.player_color:
                     self.handle_click(event.pos)
 
-            valid_moves = get_valid_plays(self.game_board, self.current_color)
-            if not valid_moves:
-                self.current_color = self.opponent_color
-                if not get_valid_plays(self.game_board, self.current_color):
-                    self.end_game()
-                    break
-
             self.draw_board()
 
             pygame.display.flip()
+
+            valid_moves = get_valid_plays(self.game_board, self.current_color)
+            if not valid_moves:
+                print("No valid move for color", self.current_color)
+                self.current_color = CellStates.WHITE if self.current_color == CellStates.BLACK else CellStates.WHITE
+                if not get_valid_plays(self.game_board, self.current_color):
+                    print("No valid move for color", self.current_color)
+                    self.end_game()
+                    break
+
+
 
     def end_game(self):
         white_score = sum(cell.state == CellStates.WHITE for row in self.game_board for cell in row)
