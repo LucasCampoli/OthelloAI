@@ -58,7 +58,7 @@ class AI:
 
     def heuristics(self, board):
         frontier_weight = -0.5
-        position_weight = 10.0
+        position_weight = 1.0
 
         white_frontier_score, black_frontier_score = self.get_frontier_disks_score(board)
         white_position_score, black_position_score = self.get_positions_score(board)

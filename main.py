@@ -126,7 +126,6 @@ class OthelloGame:
             if self.current_color == self.opponent_color:
                 utility, best_move = ai.minimax_wrap(self.game_board, 3)
                 if best_move:
-                    time.sleep(1)
                     self.game_board = make_move(self.game_board, best_move[0], best_move[1], self.current_color)
                 self.current_color = self.player_color
 
