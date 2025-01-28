@@ -7,7 +7,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 128, 0)
 LIGHT_GREEN = (0, 180, 0)
-
+RED = (255, 0, 0)
 # Represents the game as an object
 class OthelloGame:
 
@@ -84,6 +84,13 @@ class OthelloGame:
                     pygame.draw.circle(self.screen, WHITE, (cell.coords[0] * 100 + 100, cell.coords[1] * 100 + 150), 48)
                 elif cell.state == CellStates.BLACK:
                     pygame.draw.circle(self.screen, BLACK, (cell.coords[0] * 100 + 100, cell.coords[1] * 100 + 150), 48)
+
+        valid_moves = get_valid_plays(self.game_board, self.current_color)
+        for col, row in valid_moves:
+            center_x = 100 * col + 100
+            center_y = 100 * row + 150
+            pygame.draw.line(self.screen, RED, (center_x - 20, center_y - 20), (center_x + 20, center_y + 20), 3)
+            pygame.draw.line(self.screen, RED, (center_x - 20, center_y + 20), (center_x + 20, center_y - 20), 3)
 
     def handle_click(self, pos):
         x, y = pos
