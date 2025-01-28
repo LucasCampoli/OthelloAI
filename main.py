@@ -111,7 +111,7 @@ class OthelloGame:
             r, c = row + dr, col + dc
             to_flip = []
             while 0 <= r < 8 and 0 <= c < 8:
-                if board[r][c].state != color:
+                if board[r][c].state == self.opponent_color():
                     to_flip.append((r, c))
                 elif board[r][c].state == color:
                     for flip_r, flip_c in to_flip:
