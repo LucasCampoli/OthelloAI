@@ -28,5 +28,22 @@ def get_valid_plays(board, color):
                 valid_moves.append((col, row))
     return valid_moves
 
-
-
+def make_move(board, col, row, color):
+    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    board[row][col].state = color
+    opponent_color = (CellStates.WHITE if color == CellStates.BLACK else CellStates.BLACK)
+    for dr, dc in directions:
+        r, c = row + dr, col + dc
+        to_flip = []
+        while 0 <= r < 8 and 0 <= c < 8:
+            if board[r][c].state == opponent_color:
+                to_flip.append((r, c))
+            elif board[r][c].state == color:
+                for flip_r, flip_c in to_flip:
+                    board[flip_r][flip_c].state = color
+                break
+            else:
+                break
+            r += dr
+            c += dc
+    return board
