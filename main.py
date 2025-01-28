@@ -8,6 +8,7 @@ WHITE = (255, 255, 255)
 GREEN = (0, 128, 0)
 LIGHT_GREEN = (0, 180, 0)
 RED = (255, 0, 0)
+
 # Represents the game as an object
 class OthelloGame:
 
@@ -165,6 +166,12 @@ class OthelloGame:
         self.draw_board()
 
         while True:
+            if self.current_color != self.player_color:
+                utility, best_move = self.minimax(self.game_board, 3, float('-inf'), float('inf'), True)
+                if best_move:
+                    self.make_move(self.game_board, best_move[0], best_move[1], self.current_color)
+                self.current_color = self.player_color
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -179,17 +186,10 @@ class OthelloGame:
                     self.end_game()
                     break
 
-            if self.current_color != self.player_color:
-                utility, best_move = self.minimax(self.game_board, 3, float('-inf'), float('inf'), True)
-                if best_move:
-                    self.make_move(self.game_board, best_move[0], best_move[1], self.current_color)
-                self.current_color = self.player_color
-
-
-
             self.draw_board()
 
             pygame.display.flip()
+
 
     def utility(self, board):
         return 0
