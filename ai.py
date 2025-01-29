@@ -25,15 +25,9 @@ class AI:
         return self.max_player(board, depth, -float('inf'), float('inf'))
 
     def max_player(self, board, depth, alpha, beta):
-        if game_rules.is_terminal(board):
-            player_winner = game_rules.winner(board)
-            if player_winner != self.player_color:
-                return -float('inf')
-            else:
-                return float('inf')
-
         best_move = None
-        if depth == 0:
+
+        if game_rules.is_terminal(board) or depth == 0:
             return self.heuristics(board), best_move
 
         max_eval = float('-inf')
@@ -52,15 +46,9 @@ class AI:
 
 
     def min_player(self, board, depth, alpha, beta):
-        if game_rules.is_terminal(board):
-            player_winner = game_rules.winner(board)
-            if player_winner == self.player_color:
-                return -float('inf')
-            else:
-                return float('inf')
-
         best_move = None
-        if depth == 0:
+
+        if game_rules.is_terminal(board) or depth == 0:
             return self.heuristics(board), best_move
 
         min_eval = float('inf')
@@ -82,6 +70,7 @@ class AI:
 
         white_frontier_score, black_frontier_score = self.get_frontier_disks_score(board)
         white_position_score, black_position_score = self.get_positions_score(board)
+        terminal_score = self.get_terminal_score(board)
 
         if self.player_color == CellStates.WHITE:
             frontier_score = frontier_weight * (white_frontier_score - black_frontier_score)
@@ -90,7 +79,7 @@ class AI:
             frontier_score = frontier_weight * (black_frontier_score - white_frontier_score)
             position_score = position_weight * (black_position_score - white_position_score)
 
-        return frontier_score + position_score
+        return frontier_score + position_score + terminal_score
 
     # Count frontier disks for both players
     def get_frontier_disks_score(self, board):
@@ -126,3 +115,12 @@ class AI:
                 elif board[i][j].state == CellStates.BLACK:
                     black_score += black_scoring_matrix[i][j]
         return white_score, black_score
+
+    def get_terminal_score(self, board):
+        if game_rules.is_terminal(board):
+            player_winner = game_rules.winner(board)
+            if player_winner == self.player_color:
+                return float('inf')
+            else:
+                return -float('inf')
+        return 0
