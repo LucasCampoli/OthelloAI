@@ -2,6 +2,7 @@ import math
 import sys
 import time
 
+import game_rules
 from game_rules import *
 from ai import AI
 
@@ -141,6 +142,9 @@ class OthelloGame:
 
             pygame.display.flip()
 
+            if game_rules.is_terminal(self.game_board):
+                self.end_game()
+
             valid_moves = get_valid_plays(self.game_board, self.current_color)
             if not valid_moves:
                 print("No valid move for color", self.current_color)
@@ -153,8 +157,8 @@ class OthelloGame:
 
 
     def end_game(self):
-
-        print(f"Winner: {winner}")
+        player_winner = game_rules.winner(self.game_board)
+        print(f"Winner: {player_winner}")
 
         pygame.time.wait(3000)
         pygame.quit()
