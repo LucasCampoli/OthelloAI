@@ -21,7 +21,6 @@ def is_valid_play(board, col, row, color):
     return False
 
 
-
 def get_valid_plays(board, color):
     valid_moves = []
     for row in range(8):
@@ -29,6 +28,23 @@ def get_valid_plays(board, color):
             if is_valid_play(board, col, row, color):
                 valid_moves.append((col, row))
     return valid_moves
+
+
+def is_terminal(board):
+    if not get_valid_plays(board, CellStates.BLACK) and not get_valid_plays(board, CellStates.WHITE):
+        return True
+    return False
+
+def winner(board):
+    white_score = sum(cell.state == CellStates.WHITE for row in board for cell in row)
+    black_score = sum(cell.state == CellStates.BLACK for row in board for cell in row)
+
+    if white_score > black_score:
+        return CellStates.WHITE
+    elif black_score > white_score:
+        return CellStates.BLACK
+    else:
+        return None
 
 def make_move(board, col, row, color):
     directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]

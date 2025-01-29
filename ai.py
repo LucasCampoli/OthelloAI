@@ -1,4 +1,6 @@
 import copy
+
+import game_rules
 from game_rules import *
 import numpy as np
 
@@ -20,41 +22,59 @@ class AI:
         self.opposite_color = CellStates.BLACK if color == CellStates.WHITE else CellStates.WHITE
 
     def minimax_wrap(self, board, depth):
-        best_move = self.minimax(board, depth, -float('inf'), float('inf'), True)
-        print(best_move[0])
-        return best_move
+        return self.max_player(board, depth, -float('inf'), float('inf'))
 
-    def minimax(self, board, depth, alpha, beta, maximizing_player):
+    def max_player(self, board, depth, alpha, beta):
+        if game_rules.is_terminal(board):
+            player_winner = game_rules.winner(board)
+            if player_winner != self.player_color:
+                return -float('inf')
+            else:
+                return float('inf')
+
         best_move = None
-        if depth == 0 or not get_valid_plays(board, self.player_color if maximizing_player else self.opposite_color):
+        if depth == 0:
             return self.heuristics(board), best_move
-        if maximizing_player:
-            max_eval = float('-inf')
-            for move in get_valid_plays(board, self.player_color):
-                temp_board = copy.deepcopy(board)
-                make_move(temp_board, move[0], move[1], self.player_color)
-                evaluation = self.minimax(temp_board, depth - 1, alpha, beta, False)[0]
-                if evaluation > max_eval:
-                    max_eval = evaluation
-                    best_move = move
-                alpha = max(alpha, evaluation)
-                if beta <= alpha:
-                    break
-            return max_eval, best_move
-        else:
-            min_eval = float('inf')
-            for move in get_valid_plays(board, self.opposite_color):
-                temp_board = copy.deepcopy(board)
-                make_move(temp_board, move[0], move[1], self.opposite_color)
-                evaluation = self.minimax(temp_board, depth - 1, alpha, beta, True)[0]
-                if evaluation < min_eval:
-                    min_eval = evaluation
-                    best_move = move
-                beta = min(beta, evaluation)
-                if beta <= alpha:
-                    break
-            return min_eval, best_move
 
+        max_eval = float('-inf')
+        for move in get_valid_plays(board, self.player_color):
+            temp_board = copy.deepcopy(board)
+            make_move(temp_board, move[0], move[1], self.player_color)
+            evaluation = self.min_player(temp_board, depth - 1, alpha, beta)[0]
+            if evaluation > max_eval:
+                max_eval = evaluation
+                best_move = move
+
+            alpha = max(alpha, evaluation)
+            if beta <= evaluation:
+                break
+        return max_eval, best_move
+
+
+    def min_player(self, board, depth, alpha, beta):
+        if game_rules.is_terminal(board):
+            player_winner = game_rules.winner(board)
+            if player_winner == self.player_color:
+                return -float('inf')
+            else:
+                return float('inf')
+
+        best_move = None
+        if depth == 0:
+            return self.heuristics(board), best_move
+
+        min_eval = float('inf')
+        for move in get_valid_plays(board, self.opposite_color):
+            temp_board = copy.deepcopy(board)
+            make_move(temp_board, move[0], move[1], self.opposite_color)
+            evaluation = self.max_player(temp_board, depth - 1, alpha, beta)[0]
+            if evaluation < min_eval:
+                min_eval = evaluation
+                best_move = move
+            beta = min(beta, evaluation)
+            if evaluation <= alpha:
+                break
+        return min_eval, best_move
 
     def heuristics(self, board):
         frontier_weight = -0.5
