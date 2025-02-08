@@ -19,7 +19,7 @@ white_scoring_matrix = np.array([
 
 black_scoring_matrix = white_scoring_matrix.transpose()
 
-
+# Once initialized with its color, you can call minimax_wrapper to get the best move the AI can make given a board
 class AI:
     def __init__(self, color):
         self.player_color = color
@@ -34,8 +34,13 @@ class AI:
         if game_rules.is_terminal(board) or depth == 0:
             return self.heuristics(board), best_move
 
+        valid_moves = get_valid_plays(board, self.player_color)
+
+        if not valid_moves:
+            return self.min_player(board, depth, alpha, beta)
+
         max_eval = float('-inf')
-        for move in get_valid_plays(board, self.player_color):
+        for move in valid_moves:
             temp_board = copy.deepcopy(board)
             make_move(temp_board, move[0], move[1], self.player_color)
             evaluation = self.min_player(temp_board, depth - 1, alpha, beta)[0]
@@ -54,14 +59,20 @@ class AI:
         if game_rules.is_terminal(board) or depth == 0:
             return self.heuristics(board), best_move
 
+        valid_moves = get_valid_plays(board, self.opposite_color)
+
+        if not valid_moves:
+            return self.max_player(board, depth, alpha, beta)
+
         min_eval = float('inf')
-        for move in get_valid_plays(board, self.opposite_color):
+        for move in valid_moves:
             temp_board = copy.deepcopy(board)
             make_move(temp_board, move[0], move[1], self.opposite_color)
             evaluation = self.max_player(temp_board, depth - 1, alpha, beta)[0]
             if best_move is None or evaluation < min_eval:
                 min_eval = evaluation
                 best_move = move
+
             beta = min(beta, evaluation)
             if evaluation <= alpha:
                 break
